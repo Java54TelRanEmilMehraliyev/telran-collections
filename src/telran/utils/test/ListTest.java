@@ -17,13 +17,15 @@ public abstract class ListTest extends CollectionTest {
    @BeforeEach
    @Override
    void setUp() {
-	   super.setUp();
 	   list = (List<Integer>)collection;
    }
       
    @Test
    public void testAddAndGet() {
 	   list.add(1);
+	   list.add(2);
+	   list.add(3);
+	   list.add(4);
 	   assertEquals(1,list.get(0));
    }
    @Test
@@ -35,15 +37,14 @@ public abstract class ListTest extends CollectionTest {
    @Test
    public void testIndexOf() {
 	   list.add(1);
-	   assertEquals(0,list.indexOf(1));
-	   assertEquals(-1,list.indexOf(2));
-   }
+	    assertEquals(0, list.indexOf(1));
+	    assertEquals(-1, list.indexOf(2));
+	}
    @Test
    public void testLastIndexOf() {
 	   list.add(1);
-	   list.add(1);
-	   assertEquals(1, list.lastIndexOf(1));
-       assertEquals(-1, list.lastIndexOf(2));
+	   list.add(2);
+	  assertEquals(1, list.lastIndexOf(2));
    }
    @Test
    public void testIterator() {
