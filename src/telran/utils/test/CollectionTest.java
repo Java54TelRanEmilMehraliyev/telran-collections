@@ -17,13 +17,34 @@ public abstract class CollectionTest {
 			collection.add(num);
 		}
 	}
+	
 	@Test
-	void iteratorTest() {
-		runTest(numbers);
+	void addTest() {
+		assertTrue(collection.add(200));
+		assertTrue(collection.contains(200));
 	}
+	
+	@Test
+	void removeTest() {
+		assertTrue(collection.remove(100));
+		assertFalse(collection.contains(100));
+	}
+	
+	@Test
+	void containsTest() {
+		assertTrue(collection.contains(-20));
+		assertFalse(collection.contains(200));
+	}
+	
+	@Test
+	void sizeTest() {
+		assertEquals(5, collection.size());
+		collection.add(200);
+		assertEquals(6, collection.size());
+	}
+	
 	protected void runTest(Integer[] expected) {
 		Integer [] actual = collection.stream().toArray(Integer[]::new);
 		assertArrayEquals(expected, actual);
 	};
-	//TODO tests of all methods for interface Collection (see the interface Collection)
 }
