@@ -18,6 +18,7 @@ public abstract class ListTest extends CollectionTest {
    @Override
    void setUp() {
 	   list = (List<Integer>)collection;
+	   super.setUp();
    }
       
    @Test
