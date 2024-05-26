@@ -114,7 +114,7 @@ public class ArrayList<T> implements List<T> {
 			throw new IndexOutOfBoundsException();
 		}
 		T removedElement = array[index];
-		System.arraycopy(array, index +1, array, index, size - index -1);
+		System.arraycopy(array, index + 1, array, index, size - index - 1);
 		size--;
 		return removedElement;
 	}

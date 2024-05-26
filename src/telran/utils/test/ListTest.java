@@ -45,6 +45,7 @@ public abstract class ListTest extends CollectionTest {
    public void testLastIndexOf() {
 	   list.add(1);
 	   list.add(2);
+	   list.add(3);
 	  assertEquals(1, list.lastIndexOf(2));
    }
    @Test
