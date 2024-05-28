@@ -48,35 +48,29 @@ public class LinkedList<T> implements List<T> {
 
 	@Override
 	public boolean remove(T pattern) {
-		Node<T> current = head;
-		while (current != null) {
-			if (current.data.equals(pattern)) {
-				if (current == head) {
-					head = current.next;
-				} else {
-					current.prev.next = current.next;
-					current.next.prev = current.prev;
-				}
-				size--;
-				return true;
-			}
-			current = current.next;
-		}
-		return false;
+	    Node<T> current = head;
+	    while (current != null) {
+	        if (pattern == null ? current.data == null : pattern.equals(current.data)) {
+	            if (current == head) {
+	                head = current.next;
+	            } else {
+	                current.prev.next = current.next;
+	                current.next.prev = current.prev;
+	            }
+	            size--;
+	            return true;
+	        }
+	        current = current.next;
+	    }
+	    return false;
 	}
 
 	@Override
 	public boolean contains(T pattern) {
-		Node<T> current = head;
-		while (current != null) {
-			if (current.data.equals(pattern)) {
-				return true;
-			}
-			current = current.next;
-		}
-		return false;
+	    
+		return indexOf(pattern) > -1;
 	}
-
+	
 	@Override
 	public int size() {
 		return size;
@@ -92,10 +86,7 @@ public class LinkedList<T> implements List<T> {
         if(index < 0 || index >= size) {
         	throw new IndexOutOfBoundsException();
         }
-        Node<T> current = head;
-        for( int i = 0; i < index; i++) {
-        	current = current.next;
-        }
+        Node<T> current = getNode(index);
 		return current.data;
 	}
 
@@ -112,10 +103,7 @@ public class LinkedList<T> implements List<T> {
 	   if(index < 0 || index >= size) {
 		   throw new IndexOutOfBoundsException();
 	   }
-	   Node<T> current = head;
-	   for(int i = 0; i < index; i++) {
-		   current = current.next;
-	   }
+	   Node<T> current = getNode(index);
 	   T data = current.data;
 	   if(current == head) {
 		   head = current.next;
@@ -123,6 +111,8 @@ public class LinkedList<T> implements List<T> {
 		   current.prev.next = current.next;
 		   if(current.next != null) {
 			   current.next.prev = current.prev;
+		   } else {
+			   tail = current.prev;
 		   }
 	   }
 	   size--;
