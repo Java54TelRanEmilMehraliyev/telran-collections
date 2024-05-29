@@ -17,6 +17,7 @@ public abstract class CollectionTest {
 		collection = new ArrayList<>();
 		for(Integer num: numbers) {
 			collection.add(num);
+			 System.out.println(num);
 		}
 	}
 	@Test

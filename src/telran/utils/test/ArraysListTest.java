@@ -8,7 +8,7 @@ public class ArraysListTest extends ListTest {
   @BeforeEach
   @Override
   void setUp() {
-	  collection = new ArrayList<Integer>();
+	  collection = new ArrayList<>();
 	  super.setUp();
   }
 }
