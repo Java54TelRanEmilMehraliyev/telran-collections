@@ -14,6 +14,7 @@ public class HashSetTest extends SetTest {
 void setUp() {
 	collection = new HashSet<>(3, 0.75f); //for testing Hash Table re-creation
 	super.setUp();
+	System.out.println(collection);
 }
 @Override
 protected void runTest(Integer[] expected) {

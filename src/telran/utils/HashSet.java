@@ -12,8 +12,8 @@ public class HashSet<T> implements Set<T> {
 	float factor;
 
 	private class HashSetIterator implements Iterator<T> {
-       private int currentBucket = 0;
-       private Iterator<T> currentIterator = null;
+       private int currentBucket;
+       private Iterator<T> currentIterator;
 		
        @Override
 		public boolean hasNext() {
@@ -121,7 +121,7 @@ public class HashSet<T> implements Set<T> {
 	@Override
 	public int size() {
 
-		return size;
+		return this.size;
 	}
 
 	@Override

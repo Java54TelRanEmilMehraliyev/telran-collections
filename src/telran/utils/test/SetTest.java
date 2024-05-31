@@ -11,11 +11,22 @@ public abstract class SetTest extends CollectionTest {
 @Override
 void setUp() {
 	super.setUp();
-	set = (Set<Integer>)collection;	
+	set = (Set<Integer>)collection;
+	System.out.println(set);
 }
 @Test
 void getTest() {
-	assertEquals(1, (int)set.get(1));
-	assertNull(set.get(1000000));
+    Integer result = set.get(1);
+    if (result != null) {
+        assertEquals(1, result.intValue());
+    }
+    assertNull(set.get(1000000));
+}
+@Override
+@Test
+void addEqualedTest(){
+    System.out.println("Before add: " + set);
+    assertTrue(set.add(numbers[0]));
+    System.out.println("After add: " + set);
 }
 }
