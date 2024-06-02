@@ -13,7 +13,7 @@ public abstract class CollectionTest {
 	private static final int N_ELEMENTS = 1_048_575;
 	protected Collection<Integer> collection;
 	Integer[] numbers = {-20, 10, 1, 100, -5};
-	int newNumber = 1000000;
+	int newNumber = 1000;
 	@BeforeEach
 	void setUp() {
 		for(Integer num: numbers) {

@@ -12,7 +12,7 @@ public class HashSetTest extends SetTest {
 @Override
 @BeforeEach
 void setUp() {
-	collection = new HashSet<>(3, 0.75f); //for testing Hash Table re-creation
+	collection = new HashSet<>(4, 0.75f); //for testing Hash Table re-creation
 	super.setUp();
 	System.out.println(collection);
 }

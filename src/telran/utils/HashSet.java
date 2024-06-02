@@ -11,35 +11,47 @@ public class HashSet<T> implements Set<T> {
 	int size;
 	float factor;
 
-	private class HashSetIterator implements Iterator<T> {
-       private int currentBucket;
-       private Iterator<T> currentIterator;
+	private class HashSetIterator implements Iterator<T> {		
+		private int index;
+		private Iterator<T> listIterator;
+
+		public HashSetIterator() {
+			advanceIndex();
+		}
 		
-       @Override
+		private void advanceIndex() {
+			while (index < hashTable.length &&
+				(hashTable[index] == null || hashTable[index].size()==0)) {
+				index++;
+			}
+			if (index < hashTable.length) {
+				listIterator = hashTable[index].iterator();
+			}
+		}
+		@Override
 		public boolean hasNext() {
-			if(currentIterator != null && currentIterator.hasNext()) {
-				return true;
+			boolean hasNext = true;
+			if(listIterator == null || !listIterator.hasNext()) {
+				index++;
+				advanceIndex();
+				hasNext = listIterator != null && listIterator.hasNext();
 			}
-			while(++currentBucket < hashTable.length) {
-				if(hashTable[currentBucket] != null) {
-					Iterator<T> it = hashTable[currentBucket].iterator();
-					if(it.hasNext()) {
-					currentIterator = it;
-					   return true;
-					}
-				}
-			}
-			return false;
+			return hasNext;
 		}
 
 		@Override
 		public T next() {
-           if(hasNext()) {
-        	  return currentIterator.next(); 
-           }
-			throw new NoSuchElementException();
+			if (!hasNext()) {
+				throw new NoSuchElementException();
+			}
+			T nextElement = listIterator.next();
+			if (!listIterator.hasNext()) {
+				index++;
+				advanceIndex();
+			}
+			return nextElement;
 		}
-
+		
 	}
 
 	public HashSet(int hashTableLength, float factor) {
@@ -80,40 +92,36 @@ public class HashSet<T> implements Set<T> {
 	}
 
 	private void addObjInHashTable(T obj, List<T>[] table) {
-		int index = getIndex(obj);
-		List<T> list = table[index];
-		if (list == null) {
-			list = new LinkedList<>();
-			hashTable[index] = list;
-		}
-		list.add(obj);
-
+	    int hashCode = obj.hashCode();
+	    int index = Math.abs(hashCode % table.length); 
+	    List<T> list = table[index];
+	    if (list == null) {
+	        list = new LinkedList<>();
+	        table[index] = list;
+	    }
+	    list.add(obj);
 	}
 
-	private int getIndex(T obj) {
+	private int getIndex(T obj,List<T> [] lists) {
 		int hashCode = obj.hashCode();
-		int index = Math.abs(hashCode % hashTable.length);
+		int index = Math.abs(hashCode % lists.length);
 		return index;
 	}
 
 	@Override
 	public boolean remove(T pattern) {
-		int index = getIndex(pattern);
-		List<T> list = hashTable[index];
-		if (list == null || list.size() == 0) {
-			return false;
-		} else {
-			boolean removed = list.remove(pattern);
-			if (list.size() == 0) {
-				hashTable[index] = null;
-			}
-			return removed;
+		boolean res = contains(pattern);
+		if(res) {
+			int index = getIndex(pattern, hashTable);
+			hashTable[index].remove(pattern);
+			size--;
 		}
+		return res;
 	}
 
 	@Override
 	public boolean contains(T pattern) {
-		int index = getIndex(pattern);
+		int index = getIndex(pattern,hashTable);
 		List<T> list = hashTable[index];
 		return list != null && list.contains(pattern);
 	}
@@ -121,7 +129,7 @@ public class HashSet<T> implements Set<T> {
 	@Override
 	public int size() {
 
-		return this.size;
+		return size;
 	}
 
 	@Override
@@ -132,16 +140,16 @@ public class HashSet<T> implements Set<T> {
 
 	@Override
 	public T get(T pattern) {
-		int index = getIndex(pattern);
+		int index = getIndex(pattern, hashTable);
+		T res = null;
 		List<T> list = hashTable[index];
 		if (list != null) {
-			for (T item : list) {
-				if (item.equals(pattern)) {
-					return item;
-				}
+			int lIndex = list.indexOf(pattern);
+			if(lIndex > -1) {
+				res = list.get(lIndex);
 			}
 		}
-		return null;
+		return res;
 	}
 
 }

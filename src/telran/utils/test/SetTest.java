@@ -12,21 +12,20 @@ public abstract class SetTest extends CollectionTest {
 void setUp() {
 	super.setUp();
 	set = (Set<Integer>)collection;
-	System.out.println(set);
 }
 @Test
 void getTest() {
     Integer result = set.get(1);
     if (result != null) {
         assertEquals(1, result.intValue());
+    } else {
+        fail("Expected 1, but got null");
     }
-    assertNull(set.get(1000000));
+    assertNull(set.get(1000));
 }
 @Override
 @Test
 void addEqualedTest(){
-    System.out.println("Before add: " + set);
-    assertTrue(set.add(numbers[0]));
-    System.out.println("After add: " + set);
+	assertFalse(set.add(numbers[0]));
 }
 }
