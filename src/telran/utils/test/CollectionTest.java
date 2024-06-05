@@ -3,17 +3,21 @@ package telran.utils.test;
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
+import java.util.Random;
+
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import telran.utils.Collection;
 
 public abstract class CollectionTest {
 	private static final int N_ELEMENTS = 1_048_575;
+	private static final int N_RUNS = 10000000;
 	protected Collection<Integer> collection;
 	Integer[] numbers = {-20, 10, 1, 100, -5};
-	int newNumber = 1000;
+	int newNumber = 1000000;
 	@BeforeEach
 	void setUp() {
 		for(Integer num: numbers) {
@@ -31,7 +35,13 @@ public abstract class CollectionTest {
 		assertTrue(collection.add(numbers[0]));
 		runTest(expected);
 	}
-	
+	@Test
+	void addUniqueTest() {
+		
+		Integer[] expected = {-20, 10, 1, 100, -5, newNumber};
+		assertTrue(collection.add(newNumber));
+		runTest(expected);
+	}
 	@Test
 	void removeTest() {
 		assertTrue(collection.remove(numbers[0]));
@@ -58,12 +68,23 @@ public abstract class CollectionTest {
 		assertEquals(numbers.length, collection.size());
 	}
 	@Test
-	void performanceAddTest() {
-		
-		for(int i = 0; i < N_ELEMENTS; i++) {
-			collection.add(i + 1000);
+	
+	void performanceAddContainsIteratorTest() {
+		Random random = new Random();
+		int[] randomNumbers = random.ints().distinct().limit(N_ELEMENTS).toArray();
+		for(Integer num: numbers) {
+			collection.remove(num);
 		}
-		assertEquals(N_ELEMENTS + numbers.length, collection.size());
+		for(int i = 0; i < N_ELEMENTS; i++) {
+			collection.add(randomNumbers[i]);
+		}
+		assertEquals(N_ELEMENTS, collection.size());
+		Integer [] actual = new Integer[N_ELEMENTS];
+		int index = 0;
+		for(Integer num: collection) {
+			actual[index++] = num;
+		}
+		assertEquals(N_ELEMENTS, index);
 		
 	}
 }
