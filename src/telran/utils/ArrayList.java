@@ -4,12 +4,13 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.function.Predicate;
 
-public class ArrayList<T> implements List<T> {
+public class ArrayList<T> extends AbstractCollection<T> implements List<T>{
 	private static final int DEFAULT_CAPACITY = 16;
-	private int size;
 	private T[] array;
 	@SuppressWarnings("unchecked")
+	
 	public ArrayList(int capacity) {
 		array = (T[]) new Object[capacity];
 	}
@@ -18,6 +19,7 @@ public class ArrayList<T> implements List<T> {
 	}
 	private class ArrayListIterator implements Iterator<T> {
 		int currentIndex = 0;
+		boolean flNext = false;
 		@Override
 		public boolean hasNext() {
 			return currentIndex < size;
@@ -28,7 +30,16 @@ public class ArrayList<T> implements List<T> {
 			if(!hasNext()) {
 				throw new NoSuchElementException();
 			}
+			flNext = true;
 			return array[currentIndex++];
+		}
+		@Override
+		public void remove() {
+			if(!flNext) {
+				throw new IllegalStateException();
+			}
+			ArrayList.this.remove(--currentIndex);
+			flNext = false;
 		}
 		
 	}
@@ -41,29 +52,24 @@ public class ArrayList<T> implements List<T> {
 		array[size++] = obj;
 		return true;
 	}
-
-	
 	@Override
-	public boolean remove(T pattern) {
-		int index = indexOf(pattern);
-		boolean res = false;
-		if (index > -1) {
-			res = true;
-			remove(index);
+	public boolean removeIf(Predicate<T> predicate) {
+		int i = 0;
+		int j = 0;
+		boolean removed = false;
+		while(i < size) {
+			if(predicate.test(array[i])) {
+				removed = true;
+			} else {
+				array[j++] = array[i];
+			}
+			i++;
 		}
-		return res;
-	}
-
-	@Override
-	public boolean contains(T pattern) {
-		
-		return indexOf(pattern) > -1;
-	}
-
-	@Override
-	public int size() {
-		
-		return size;
+		while(j < size) {
+			array[j++] = null;
+		}
+		size = i - j;
+		return removed;
 	}
 
 	@Override
@@ -90,7 +96,7 @@ public class ArrayList<T> implements List<T> {
 		if(size == array.length) {
 			array = Arrays.copyOf(array, array.length * 2);
 		}
-		
+
 	}
 	@Override
 	public T remove(int index) {

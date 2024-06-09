@@ -4,10 +4,9 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
-public class LinkedList<T> implements List<T> {
+public class LinkedList<T> extends AbstractCollection<T> implements List<T> {
 	Node<T> head;
 	Node<T> tail;
-	int size;
  private static class Node<T> {
 	 T data;
 	 Node<T> prev;
@@ -22,31 +21,11 @@ public class LinkedList<T> implements List<T> {
 		addNode(size, node);
 		return true;
 	}
-
-	@Override
-	public boolean remove(T pattern) {
-		int index = indexOf(pattern);
-		boolean res = false;
-		if (index > -1) {
-			res = true;
-			remove(index);
-		}
-		return res;
-	}
-
-	@Override
-	public boolean contains(T pattern) {
-		
-		return indexOf(pattern) > - 1;
-	}
-
-	@Override
-	public int size() {
-		
-		return size;
-	}
+	
 	private class LinkedListIterator implements Iterator<T> {
 		Node<T> current = head;
+		Node<T> lastReturned = null;
+		
 		@Override
 		public boolean hasNext() {
 			return current != null;
@@ -57,12 +36,21 @@ public class LinkedList<T> implements List<T> {
 			if(!hasNext()) {
 				throw new NoSuchElementException();
 			}
+			lastReturned = current;
 			T res = current.data;
 			current = current.next;
 			return res;
 		}
-		
+		@Override
+		public void remove() {
+			if(lastReturned == null) {
+				throw new IllegalStateException();
+			}
+			removeNode(lastReturned);
+			lastReturned = null;
+		}	
 	}
+	
 	@Override
 	public Iterator<T> iterator() {
 		

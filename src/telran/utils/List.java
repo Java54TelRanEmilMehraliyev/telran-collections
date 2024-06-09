@@ -49,4 +49,21 @@ public interface List<T> extends Collection<T> {
 	 * otherwise -1
 	 */
 	int lastIndexOf(T pattern) ;
+	/****************************************************************/
+	@Override
+	default  boolean remove(T pattern) {
+		int index = indexOf(pattern);
+		boolean res = false;
+		if (index > -1) {
+			res = true;
+			remove(index);
+		}
+		return res;
+	}
+	@Override
+	default boolean contains(T pattern) {
+		
+		return indexOf(pattern) > - 1;
+	}
+	
 }

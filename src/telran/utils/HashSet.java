@@ -6,17 +6,16 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 
 @SuppressWarnings("unchecked")
-public class HashSet<T> implements Set<T> {
+public class HashSet<T> extends AbstractCollection<T> implements Set<T> {
 	private static final int DEFAULT_HASH_TABLE_LENGTH = 16;
 	private static final float DEFAULT_FACTOR = 0.75f;
 	List<T>[] hashTable;
-	int size;
 	float factor;
 
 	private class HashSetIterator implements Iterator<T> {
 		Iterator<T> iterator;
-
 		int iteratorIndex;
+		T lastReturned = null;
 
 		HashSetIterator() {
 			iteratorIndex = 0;
@@ -40,9 +39,9 @@ public class HashSet<T> implements Set<T> {
 			if (!hasNext()) {
 				throw new NoSuchElementException();
 			}
-			T res = iterator.next();
+			lastReturned = iterator.next();
 			setIteratorIndex();
-			return res;
+			return lastReturned;
 		}
 
 		private void setIteratorIndex() {
@@ -54,6 +53,14 @@ public class HashSet<T> implements Set<T> {
 			if (iteratorIndex == limit && (hashTable[iteratorIndex] == null || !iterator.hasNext())) {
 				iteratorIndex++;
 			}
+		}
+		@Override
+		public void remove() {
+			if(lastReturned == null) {
+				throw new IllegalStateException();
+			}
+			HashSet.this.remove(lastReturned);
+			lastReturned = null;
 		}
 
 	}
@@ -130,12 +137,7 @@ public class HashSet<T> implements Set<T> {
 		return list != null && list.contains(pattern);
 	}
 
-	@Override
-	public int size() {
-
-		return size;
-	}
-
+	
 	@Override
 	public Iterator<T> iterator() {
 
