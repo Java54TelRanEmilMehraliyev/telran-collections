@@ -54,24 +54,22 @@ public class ArrayList<T> extends AbstractCollection<T> implements List<T>{
 	}
 	@Override
 	public boolean removeIf(Predicate<T> predicate) {
-		int i = 0;
-		int j = 0;
-		boolean removed = false;
-		while(i < size) {
-			if(predicate.test(array[i])) {
-				removed = true;
-			} else {
-				array[j++] = array[i];
-			}
-			i++;
-		}
-		while(j < size) {
-			array[j++] = null;
-		}
-		size = i - j;
-		return removed;
+	    boolean removed = false;
+	    for (int i = 0, j = 0; i < size; i++) {
+	        if (predicate.test(array[i])) {
+	            removed = true;
+	        } else {
+	            array[j++] = array[i];
+	        }
+	        if (removed) {
+	            array[i] = null;
+	        }
+	        if (i == size - 1) {
+	            size = j;
+	        }
+	    }
+	    return removed;
 	}
-
 	@Override
 	public Iterator<T> iterator() {
 		return new ArrayListIterator();
