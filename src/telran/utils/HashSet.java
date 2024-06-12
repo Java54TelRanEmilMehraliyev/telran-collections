@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.function.Predicate;
 
 @SuppressWarnings("unchecked")
 public class HashSet<T> extends AbstractCollection<T> implements Set<T> {
@@ -14,8 +15,9 @@ public class HashSet<T> extends AbstractCollection<T> implements Set<T> {
 
 	private class HashSetIterator implements Iterator<T> {
 		Iterator<T> iterator;
+		Iterator<T> prevIterator = null;
 		int iteratorIndex;
-		T lastReturned = null;
+		
 
 		HashSetIterator() {
 			iteratorIndex = 0;
@@ -39,9 +41,10 @@ public class HashSet<T> extends AbstractCollection<T> implements Set<T> {
 			if (!hasNext()) {
 				throw new NoSuchElementException();
 			}
-			lastReturned = iterator.next();
+			prevIterator = iterator;
+			T nextElement = iterator.next();
 			setIteratorIndex();
-			return lastReturned;
+			return nextElement;
 		}
 
 		private void setIteratorIndex() {
@@ -56,13 +59,42 @@ public class HashSet<T> extends AbstractCollection<T> implements Set<T> {
 		}
 		@Override
 		public void remove() {
-			if(lastReturned == null) {
+			if(prevIterator == null) {
 				throw new IllegalStateException();
 			}
-			HashSet.this.remove(lastReturned);
-			lastReturned = null;
+			prevIterator.remove();
+			size--;
+			prevIterator = null;
 		}
 
+	}
+	@Override
+	public boolean removeIf(Predicate<T> predicate) {
+	    boolean removed = false;
+	    for (List<T> list : hashTable) {
+	        if (list != null) {
+	            Iterator<T> it = list.iterator();
+	            while (it.hasNext()) {
+	                T t = it.next();
+	                if (predicate.test(t)) {
+	                    it.remove();
+	                    size--;
+	                    removed = true;
+	                }
+	            }
+	        }
+	    }
+	    return removed;
+	}
+	
+	@Override
+	public void clear() {
+	    for (List<T> list : hashTable) {
+	        if (list != null) {
+	            list.clear();
+	        }
+	    }
+	    size = 0;
 	}
 
 	public HashSet(int hashTableLength, float factor) {

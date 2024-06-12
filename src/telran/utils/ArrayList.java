@@ -20,6 +20,7 @@ public class ArrayList<T> extends AbstractCollection<T> implements List<T>{
 	private class ArrayListIterator implements Iterator<T> {
 		int currentIndex = 0;
 		boolean flNext = false;
+		
 		@Override
 		public boolean hasNext() {
 			return currentIndex < size;
