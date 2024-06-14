@@ -17,8 +17,7 @@ private static class Node<T> {
 }
 private class TreeSetIterator implements Iterator<T> {
 	Node<T> current = getLeastFrom(root);
-	Node<T> lastReturned = null;
-	
+	Node<T> prev;
 	@Override
 	public boolean hasNext() {
 		
@@ -30,25 +29,30 @@ private class TreeSetIterator implements Iterator<T> {
 		if(!hasNext()) {
 			throw new NoSuchElementException();
 		}
-		T res = current.data;
-		lastReturned = current;
+		prev = current;
 		current = getCurrent(current);
-		return res;
+		return prev.data;
 	}
-	
 	@Override
 	public void remove() {
-		if(lastReturned == null) {
+		if(prev == null) {
 			throw new IllegalStateException();
 		}
-		Node<T> nodeToRemove = lastReturned;
-		lastReturned = null;
-		removeNode(nodeToRemove);
+		removeNode(prev);
+		prev = null;
 	}
 	
 }
+private static final int DEFAULT_SPACES_PER_LEVEL = 2;
 	Node<T> root;
 	private Comparator<T> comp;
+	private int spacesPerLevel = DEFAULT_SPACES_PER_LEVEL;
+	public int getSpacesPerLevel() {
+		return spacesPerLevel;
+	}
+	public void setSpacesPerLevel(int spacesPerLevel) {
+		this.spacesPerLevel = spacesPerLevel;
+	}
 	public TreeSet(Comparator<T> comp) {
 		this.comp = comp;
 	}
@@ -84,6 +88,7 @@ private class TreeSetIterator implements Iterator<T> {
 	}
 
 	public Node<T> getCurrent(Node<T> current) {
+		
 		return current.right != null ? getLeastFrom(current.right) :
 			getFirstGreaterParent(current);
 	}
@@ -228,5 +233,130 @@ private class TreeSetIterator implements Iterator<T> {
 		}
 		return node;
 	}
+	@Override
+	/**
+	 * Returns the greatest element in this set less than 
+	 * or equal to the given element,
+	 *  or null if there is no such element
+	 */
+	public T floor(T key) {
+		return floor(root,key,null);
+	}
+	private T floor(Node<T> node, T key, T floor) {
+		if(node == null) {
+			return floor;
+		}
+		int cmp = comp.compare(key, node.data);
+		if(cmp < 0) {
+			return floor(node.left, key, floor);
+		} else if (cmp > 0) {
+			return floor(node.right, key, node.data);
+		} else {
+		
+		return node.data;
+	}
+	}
+	@Override
+	/**
+	 * Returns the least element in this set greater than 
+	 * or equal to the given element,
+	 *  or null if there is no such element
+	 */
+	public T ceilling(T key) {
+		return ceilling(root,key,null);
+	}
+	private T ceilling(Node<T> node, T key, T ceilling) {
+		if(node == null) {
+			return ceilling;
+		}
+		int cmp = comp.compare(key, node.data);
+		if(cmp > 0) {
+			return ceilling(node.right, key, ceilling);
+		} else if (cmp < 0) {
+			return ceilling(node.left, key, node.data);
+			
+		} else 
+		return node.data;
+	}
+	/**
+	 * display tree in the following form:
+	 *  -20
+	 *     10
+	 *        1
+	 *           -5
+	 *        100
+	 */
+	public void displayRootChildren() {
+		//TODO
+	}
+	/*****************************************/
+	/**
+	 * conversion of tree so that iterating has been in the inversive order
+	 */
+	public void treeInversion() {
+		//TODO
+	}
+	/**
+	 * displays tree in the following form
+	 *           100
+	 *         10
+	 *           1
+	 *              -5
+	 *   -20           
+	 */
+	public void displayTreeRotated() {
+		displayTreeRotated(root, 1);
+	}
+	private void displayTreeRotated(Node<T> tmpRoot, int level) {
+		if (tmpRoot != null) {
+			displayTreeRotated(tmpRoot.right, level + 1);
+			displayRoot(tmpRoot, level);
+			displayTreeRotated(tmpRoot.left, level + 1);
+		}
+		
+	}
+	private void displayRoot(Node<T> tmpRoot, int level) {
+		System.out.printf("%s", " ".repeat(level * spacesPerLevel ));
+		System.out.println(tmpRoot.data);
+		
+	}
+	/**
+	 * 
+	 * @return number of leaves (leaf - node with both left and right nulls)
+	 */
+	public int width() {
+		
+		return width(root);
+	}
+	private int width(Node<T> tmpRoot) {
+		int res = 0;
+		if(tmpRoot != null) {
+			if(tmpRoot.left == null && tmpRoot.right == null) {
+				res = 1;
+			} else {
+				res = width(tmpRoot.left) + width(tmpRoot.right);
+			}
+		}
+		return res;
+	}
+	/****************************************/
+	/**
+	 * 
+	 * @return number of the nodes of the longest line
+	 */
+	public int height() {
+		
+		return height(root);
+	}
+	private int height(Node<T> tmpRoot) {
+		int res = 0;
+		if (tmpRoot != null) {
+			int heightLeft = height(tmpRoot.left);
+			int heightRight = height(tmpRoot.right);
+			res = Math.max(heightLeft, heightRight) + 1;
+		}
+		return res;
+	}
+	
 
 }
