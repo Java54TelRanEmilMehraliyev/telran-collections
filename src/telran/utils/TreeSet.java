@@ -5,65 +5,75 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 public class TreeSet<T> extends AbstractCollection<T> implements SortedSet<T> {
-private static class Node<T> {
-	T data;
-	Node<T> parent;
-	Node<T> left;
-	Node<T> right;
-	Node(T data) {
-		this.data = data;
-	}
-	
-}
-private class TreeSetIterator implements Iterator<T> {
-	Node<T> current = getLeastFrom(root);
-	Node<T> prev;
-	@Override
-	public boolean hasNext() {
-		
-		return current != null;
+	private static class Node<T> {
+		T data;
+		Node<T> parent;
+		Node<T> left;
+		Node<T> right;
+
+		Node(T data) {
+			this.data = data;
+		}
+
 	}
 
-	@Override
-	public T next() {
-		if(!hasNext()) {
-			throw new NoSuchElementException();
+	private class TreeSetIterator implements Iterator<T> {
+		Node<T> current = getLeastFrom(root);
+		Node<T> prev;
+
+		@Override
+		public boolean hasNext() {
+
+			return current != null;
 		}
-		prev = current;
-		current = getCurrent(current);
-		return prev.data;
-	}
-	@Override
-	public void remove() {
-		if(prev == null) {
-			throw new IllegalStateException();
+
+		@Override
+		public T next() {
+			if (!hasNext()) {
+				throw new NoSuchElementException();
+			}
+			prev = current;
+			current = getCurrent(current);
+			return prev.data;
 		}
-		removeNode(prev);
-		prev = null;
+
+		@Override
+		public void remove() {
+			if (prev == null) {
+				throw new IllegalStateException();
+			}
+			removeNode(prev);
+			prev = null;
+		}
+
 	}
-	
-}
-private static final int DEFAULT_SPACES_PER_LEVEL = 2;
+
+	private static final int DEFAULT_SPACES_PER_LEVEL = 2;
 	Node<T> root;
 	private Comparator<T> comp;
 	private int spacesPerLevel = DEFAULT_SPACES_PER_LEVEL;
+
 	public int getSpacesPerLevel() {
 		return spacesPerLevel;
 	}
+
 	public void setSpacesPerLevel(int spacesPerLevel) {
 		this.spacesPerLevel = spacesPerLevel;
 	}
+
 	public TreeSet(Comparator<T> comp) {
 		this.comp = comp;
 	}
+
 	@SuppressWarnings("unchecked")
 	public TreeSet() {
-		this((Comparator<T>)Comparator.naturalOrder());
+		this((Comparator<T>) Comparator.naturalOrder());
 	}
+
 	@Override
 	public T get(T pattern) {
 		Node<T> node = getNode(pattern);
-		
+
 		return node == null ? null : node.data;
 	}
 
@@ -80,7 +90,7 @@ private static final int DEFAULT_SPACES_PER_LEVEL = 2;
 		Node<T> current = root;
 		Node<T> parent = null;
 		int compRes = 0;
-		while(current != null && (compRes = comp.compare(pattern, current.data)) != 0) {
+		while (current != null && (compRes = comp.compare(pattern, current.data)) != 0) {
 			parent = current;
 			current = compRes > 0 ? current.right : current.left;
 		}
@@ -88,23 +98,23 @@ private static final int DEFAULT_SPACES_PER_LEVEL = 2;
 	}
 
 	public Node<T> getCurrent(Node<T> current) {
-		
-		return current.right != null ? getLeastFrom(current.right) :
-			getFirstGreaterParent(current);
+
+		return current.right != null ? getLeastFrom(current.right) : getFirstGreaterParent(current);
 	}
 
 	private Node<T> getFirstGreaterParent(Node<T> current) {
 		Node<T> parent = current.parent;
-		while(parent != null && parent.right == current) {
+		while (parent != null && parent.right == current) {
 			current = current.parent;
 			parent = current.parent;
 		}
 		return parent;
 	}
+
 	private Node<T> getLeastFrom(Node<T> node) {
 		if (node != null) {
-			
-			while(node.left != null) {
+
+			while (node.left != null) {
 				node = node.left;
 			}
 		}
@@ -114,13 +124,13 @@ private static final int DEFAULT_SPACES_PER_LEVEL = 2;
 	@Override
 	public boolean add(T obj) {
 		boolean res = false;
-		if(obj == null) {
+		if (obj == null) {
 			throw new NullPointerException();
 		}
-		if(!contains(obj)) {
+		if (!contains(obj)) {
 			res = true;
 			Node<T> node = new Node<>(obj);
-			if(root == null) {
+			if (root == null) {
 				addRoot(node);
 			} else {
 				addWithParent(node);
@@ -132,13 +142,13 @@ private static final int DEFAULT_SPACES_PER_LEVEL = 2;
 
 	private void addWithParent(Node<T> node) {
 		Node<T> parent = getParent(node);
-		if(comp.compare(node.data,parent.data) > 0) {
+		if (comp.compare(node.data, parent.data) > 0) {
 			parent.right = node;
 		} else {
 			parent.left = node;
 		}
 		node.parent = parent;
-		
+
 	}
 
 	private Node<T> getParent(Node<T> node) {
@@ -148,7 +158,7 @@ private static final int DEFAULT_SPACES_PER_LEVEL = 2;
 
 	private void addRoot(Node<T> node) {
 		root = node;
-		
+
 	}
 
 	@Override
@@ -163,175 +173,202 @@ private static final int DEFAULT_SPACES_PER_LEVEL = 2;
 	}
 
 	private void removeNode(Node<T> node) {
-		if(node.left != null && node.right != null) {
+		if (node.left != null && node.right != null) {
 			removeJunction(node);
 		} else {
 			removeNonJunction(node);
 		}
-		
+
 		size--;
 	}
 
 	private void setNulls(Node<T> node) {
 		node.data = null;
 		node.parent = node.left = node.right = null;
-		
+
 	}
+
 	private void removeJunction(Node<T> node) {
 		Node<T> substitute = getGreatestFrom(node.left);
 		node.data = substitute.data;
 		removeNonJunction(substitute);
-		
+
 	}
+
 	private void removeNonJunction(Node<T> node) {
 		Node<T> parent = node.parent;
 		Node<T> child = node.left != null ? node.left : node.right;
-		if(parent == null) {
-			root = child; //actual root removing
-		} else if(node == parent.left) {
+		if (parent == null) {
+			root = child; // actual root removing
+		} else if (node == parent.left) {
 			parent.left = child;
 		} else {
 			parent.right = child;
 		}
-		if(child != null) {
+		if (child != null) {
 			child.parent = parent;
 		}
 		setNulls(node);
-		
+
 	}
+
 	@Override
 	public boolean contains(T pattern) {
-		
+
 		return getNode(pattern) != null;
 	}
 
-	
-
 	@Override
 	public Iterator<T> iterator() {
-		
+
 		return new TreeSetIterator();
 	}
 
 	@Override
 	public T first() {
-		
+
 		return root == null ? null : getLeastFrom(root).data;
 	}
 
 	@Override
 	public T last() {
-		
+
 		return root == null ? null : getGreatestFrom(root).data;
 	}
 
 	private Node<T> getGreatestFrom(Node<T> node) {
-		if(node != null) {
-			while(node.right != null) {
+		if (node != null) {
+			while (node.right != null) {
 				node = node.right;
 			}
 		}
 		return node;
 	}
-	@Override
+
+//	@Override
+//	/**
+//	 * Returns the greatest element in this set less than or equal to the given
+//	 * element, or null if there is no such element
+//	 */
+//	public T floor(T key) {
+//	    return floor(root, key, null);
+//	}
+//
+//	private T floor(Node<T> node, T key, T floor) {
+//	    if(node == null) {
+//	        return floor;
+//	    }
+//	    int cmp = comp.compare(key, node.data);
+//	    if(cmp < 0) {
+//	        return floor(node.left, key, floor);
+//	    } else if (cmp > 0) {
+//	        return floor(node.right, key, node.data);
+//	    } else {
+//	        return node.data;
+//	    }
+//	}
+//
+//	@Override
+//	/**
+//	 * Returns the least element in this set greater than or equal to the given
+//	 * element, or null if there is no such element
+//	 */
+//	public T ceilling(T key) {
+//	    return ceiling(root, key, null);
+//	}
+//
+//	private T ceiling(Node<T> node, T key, T ceiling) {
+//	    if(node == null) {
+//	        return ceiling;
+//	    }
+//	    int cmp = comp.compare(key, node.data);
+//	    if(cmp < 0) {
+//	        return ceiling(node.left, key, node.data);
+//	    } else if (cmp > 0) {
+//	        return ceiling(node.right, key, ceiling);
+//	    } else {
+//	        return node.data;
+//	    }
+//	}
+    @Override
+    public T floor(T key) {
+        return findClosest(key, true);
+    }
+
+    @Override
+    public T ceiling(T key) {
+        return findClosest(key, false);
+    }
+
+    private T findClosest(T key, boolean isFloor) {
+        Node<T> closest = null;
+        Node<T> current = root;
+
+        while (current != null) {
+            int cmp = comp.compare(key, current.data);
+            if (cmp < 0) {
+                if (!isFloor) closest = current;
+                current = current.left;
+            } else if (cmp > 0) {
+                if (isFloor) closest = current;
+                current = current.right;
+            } else {
+                return current.data;
+            }
+        }
+        return closest == null ? null : closest.data;
+    }
+
 	/**
-	 * Returns the greatest element in this set less than 
-	 * or equal to the given element,
-	 *  or null if there is no such element
-	 */
-	public T floor(T key) {
-		return floor(root,key,null);
-	}
-	private T floor(Node<T> node, T key, T floor) {
-		if(node == null) {
-			return floor;
-		}
-		int cmp = comp.compare(key, node.data);
-		if(cmp < 0) {
-			return floor(node.left, key, floor);
-		} else if (cmp > 0) {
-			return floor(node.right, key, node.data);
-		} else {
-		
-		return node.data;
-	}
-	}
-	@Override
-	/**
-	 * Returns the least element in this set greater than 
-	 * or equal to the given element,
-	 *  or null if there is no such element
-	 */
-	public T ceilling(T key) {
-		return ceilling(root,key,null);
-	}
-	private T ceilling(Node<T> node, T key, T ceilling) {
-		if(node == null) {
-			return ceilling;
-		}
-		int cmp = comp.compare(key, node.data);
-		if(cmp > 0) {
-			return ceilling(node.right, key, ceilling);
-		} else if (cmp < 0) {
-			return ceilling(node.left, key, node.data);
-			
-		} else 
-		return node.data;
-	}
-	/**
-	 * display tree in the following form:
-	 *  -20
-	 *     10
-	 *        1
-	 *           -5
-	 *        100
+	 * display tree in the following form: -20 10 1 -5 100
 	 */
 	public void displayRootChildren() {
-		//TODO
+		// TODO
 	}
+
 	/*****************************************/
 	/**
 	 * conversion of tree so that iterating has been in the inversive order
 	 */
 	public void treeInversion() {
-		//TODO
+		// TODO
 	}
+
 	/**
-	 * displays tree in the following form
-	 *           100
-	 *         10
-	 *           1
-	 *              -5
-	 *   -20           
+	 * displays tree in the following form 100 10 1 -5 -20
 	 */
 	public void displayTreeRotated() {
 		displayTreeRotated(root, 1);
 	}
+
 	private void displayTreeRotated(Node<T> tmpRoot, int level) {
 		if (tmpRoot != null) {
 			displayTreeRotated(tmpRoot.right, level + 1);
 			displayRoot(tmpRoot, level);
 			displayTreeRotated(tmpRoot.left, level + 1);
 		}
-		
+
 	}
+
 	private void displayRoot(Node<T> tmpRoot, int level) {
-		System.out.printf("%s", " ".repeat(level * spacesPerLevel ));
+		System.out.printf("%s", " ".repeat(level * spacesPerLevel));
 		System.out.println(tmpRoot.data);
-		
+
 	}
+
 	/**
 	 * 
 	 * @return number of leaves (leaf - node with both left and right nulls)
 	 */
 	public int width() {
-		
+
 		return width(root);
 	}
+
 	private int width(Node<T> tmpRoot) {
 		int res = 0;
-		if(tmpRoot != null) {
-			if(tmpRoot.left == null && tmpRoot.right == null) {
+		if (tmpRoot != null) {
+			if (tmpRoot.left == null && tmpRoot.right == null) {
 				res = 1;
 			} else {
 				res = width(tmpRoot.left) + width(tmpRoot.right);
@@ -339,15 +376,17 @@ private static final int DEFAULT_SPACES_PER_LEVEL = 2;
 		}
 		return res;
 	}
+
 	/****************************************/
 	/**
 	 * 
 	 * @return number of the nodes of the longest line
 	 */
 	public int height() {
-		
+
 		return height(root);
 	}
+
 	private int height(Node<T> tmpRoot) {
 		int res = 0;
 		if (tmpRoot != null) {
@@ -357,6 +396,5 @@ private static final int DEFAULT_SPACES_PER_LEVEL = 2;
 		}
 		return res;
 	}
-	
 
 }

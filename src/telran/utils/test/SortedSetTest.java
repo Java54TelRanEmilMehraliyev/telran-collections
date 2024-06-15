@@ -38,8 +38,11 @@ abstract class SortedSetTest extends SetTest {
 	void floorTest() {
 		assertEquals(10, set.floor(10));
 		assertEquals(10, set.floor(11));
+		assertEquals(1, set.floor(5));
 		assertNull(set.floor(-25));
 		assertEquals(100, set.floor(150));
+		
+
 	}
 	@Test
 	void ceilingTest() {
@@ -47,6 +50,8 @@ abstract class SortedSetTest extends SetTest {
 		assertEquals(100, set.ceilling(11));
 		assertNull(set.ceilling(150));
 		assertEquals(-20, set.ceilling(-25));
+		
+
 	}
 
 }
