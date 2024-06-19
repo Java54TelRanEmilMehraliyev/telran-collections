@@ -245,85 +245,60 @@ public class TreeSet<T> extends AbstractCollection<T> implements SortedSet<T> {
 		return node;
 	}
 
-//	@Override
-//	/**
-//	 * Returns the greatest element in this set less than or equal to the given
-//	 * element, or null if there is no such element
-//	 */
-//	public T floor(T key) {
-//	    return floor(root, key, null);
-//	}
-//
-//	private T floor(Node<T> node, T key, T floor) {
-//	    if(node == null) {
-//	        return floor;
-//	    }
-//	    int cmp = comp.compare(key, node.data);
-//	    if(cmp < 0) {
-//	        return floor(node.left, key, floor);
-//	    } else if (cmp > 0) {
-//	        return floor(node.right, key, node.data);
-//	    } else {
-//	        return node.data;
-//	    }
-//	}
-//
-//	@Override
-//	/**
-//	 * Returns the least element in this set greater than or equal to the given
-//	 * element, or null if there is no such element
-//	 */
-//	public T ceilling(T key) {
-//	    return ceiling(root, key, null);
-//	}
-//
-//	private T ceiling(Node<T> node, T key, T ceiling) {
-//	    if(node == null) {
-//	        return ceiling;
-//	    }
-//	    int cmp = comp.compare(key, node.data);
-//	    if(cmp < 0) {
-//	        return ceiling(node.left, key, node.data);
-//	    } else if (cmp > 0) {
-//	        return ceiling(node.right, key, ceiling);
-//	    } else {
-//	        return node.data;
-//	    }
-//	}
-    @Override
-    public T floor(T key) {
-        return findClosest(key, true);
-    }
 
-    @Override
-    public T ceiling(T key) {
-        return findClosest(key, false);
-    }
+	@Override
+	public T floor(T key) {
+		return findClosest(key, true);
+	}
 
-    private T findClosest(T key, boolean isFloor) {
-        Node<T> closest = null;
-        Node<T> current = root;
+	@Override
+	public T ceiling(T key) {
+		return findClosest(key, false);
+	}
 
-        while (current != null) {
-            int cmp = comp.compare(key, current.data);
-            if (cmp < 0) {
-                if (!isFloor) closest = current;
-                current = current.left;
-            } else if (cmp > 0) {
-                if (isFloor) closest = current;
-                current = current.right;
-            } else {
-                return current.data;
-            }
-        }
-        return closest == null ? null : closest.data;
-    }
+	private T findClosest(T key, boolean isFloor) {
+		if (key == null) {
+			throw new NullPointerException(isFloor ? "Floor" : "Ceilling");
+		}
+
+		Node<T> closest = null;
+		Node<T> current = root;
+
+		while (current != null) {
+			int cmp = comp.compare(key, current.data);
+			if (cmp < 0) {
+				if (!isFloor)
+					closest = current;
+				current = current.left;
+			} else if (cmp > 0) {
+				if (isFloor)
+					closest = current;
+				current = current.right;
+			} else {
+				return current.data;
+			}
+		}
+		return closest == null ? null : closest.data;
+	}
 
 	/**
 	 * display tree in the following form: -20 10 1 -5 100
 	 */
 	public void displayRootChildren() {
-		// TODO
+      System.out.println("*****displayRootChildren start*****");
+      if(root != null) {
+    	  displayRootChildren(root,1);
+      }
+      System.out.println("*****displayRootChildren end*****");
+	}
+
+	private void displayRootChildren(Node<T> node, int level) {
+		if(node != null) {
+			displayRoot(node, level);
+			displayRootChildren(node.left, level + 1);
+			displayRootChildren(node.right, level + 1);
+		}
+		
 	}
 
 	/*****************************************/
@@ -331,7 +306,25 @@ public class TreeSet<T> extends AbstractCollection<T> implements SortedSet<T> {
 	 * conversion of tree so that iterating has been in the inversive order
 	 */
 	public void treeInversion() {
-		// TODO
+		inversion(root);
+		if (root != null && ((root.left != null || root.right != null))) {
+			comp = comp.reversed();
+		}
+	}
+
+	private void inversion(Node<T> node) {
+		if (node != null) {
+			swapNode(node);
+			inversion(node.left);
+			inversion(node.right);
+		}
+	}
+
+	private void swapNode(Node<T> node) {
+		Node<T> temp = node.left;
+		node.left = node.right;
+		node.right = temp;
+
 	}
 
 	/**
@@ -393,6 +386,38 @@ public class TreeSet<T> extends AbstractCollection<T> implements SortedSet<T> {
 			int heightLeft = height(tmpRoot.left);
 			int heightRight = height(tmpRoot.right);
 			res = Math.max(heightLeft, heightRight) + 1;
+		}
+		return res;
+	}
+
+	public void balance() {
+		// sorted array of tree nodes
+		if (root != null) {
+			Node<T>[] arrayNodes = getNodesArray();
+			root = balanceArray(arrayNodes, 0, size - 1, null);
+		}
+
+	}
+
+	private Node<T> balanceArray(Node<T>[] arrayNodes, int left, int right, Node<T> parent) {
+		Node<T> root = null;
+		if (left <= right) {
+			int indexRoot = (left + right) / 2;
+			root = arrayNodes[indexRoot];
+			root.parent = parent;
+			root.left = balanceArray(arrayNodes, left, indexRoot - 1, root);
+			root.right = balanceArray(arrayNodes, indexRoot + 1, right, root);
+		}
+		return root;
+	}
+
+	@SuppressWarnings("unchecked")
+	private Node<T>[] getNodesArray() {
+		Node<T>[] res = new Node[size];
+		Node<T> current = getLeastFrom(root);
+		for (int i = 0; i < size; i++) {
+			res[i] = current;
+			current = getCurrent(current);
 		}
 		return res;
 	}

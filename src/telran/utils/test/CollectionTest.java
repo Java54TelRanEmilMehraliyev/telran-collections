@@ -10,6 +10,7 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 
@@ -17,7 +18,7 @@ import telran.utils.Collection;
 import telran.utils.List;
 
 public abstract class CollectionTest {
-	private static final int N_ELEMENTS = 1_048_575;
+	protected static final int N_ELEMENTS = 1_048_575;
 	private static final int N_RUNS = 1000000;
 	protected Collection<Integer> collection;
 	Integer[] numbers = {-20, 10, 1, 100, -5};
@@ -101,6 +102,7 @@ public abstract class CollectionTest {
 			actual[index++] = num;
 		}
 		assertEquals(N_ELEMENTS, index);
+		
 		if(collection instanceof List) {
 			System.out.println("Performance test of method \"contains\" for all List objects takes huge time");
 		} else {
@@ -110,7 +112,7 @@ public abstract class CollectionTest {
 		}
 		
 	}
-	private void createBigRandomCollection(Random random) {
+	protected void createBigRandomCollection(Random random) {
 		int[] randomNumbers = random.ints().distinct().limit(N_ELEMENTS).toArray();
 		for(Integer num: numbers) {
 			collection.remove(num);
@@ -124,6 +126,7 @@ public abstract class CollectionTest {
 		assertTrue(collection.removeIf(n -> n % 2 == 0));
 		assertTrue(collection.stream().allMatch(n -> n % 2 != 0));
 		assertFalse(collection.removeIf(n -> n % 2 == 0));
+		assertEquals(2, collection.size());
 	}
 	@Test
 	void clearTest() {
@@ -137,5 +140,6 @@ public abstract class CollectionTest {
 		createBigRandomCollection(new Random());
 		collection.clear();
 	}
+	
 	
 }
